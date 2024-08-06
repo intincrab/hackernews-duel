@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { fetchRecentStories, Story } from '../utils/api';
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ExternalLink } from 'lucide-react';
 
 export default function Home() {
   const [stories, setStories] = useState<Story[]>([]);
@@ -61,6 +62,12 @@ export default function Home() {
     setIsPaused(false);
     setCorrectIndex(null);
   }
+  function getDaysAgo(timestamp: number): string {
+    const now = Date.now();
+    const diffInDays = Math.floor((now - timestamp * 1000) / (1000 * 60 * 60 * 24));
+    return `${diffInDays} days ago`;
+  }
+
 
   function handleGuess(index: 0 | 1) {
     if (!currentPair || selectedIndex !== null) return;
@@ -86,6 +93,12 @@ export default function Home() {
     setIsPaused(!isPaused);
   }
 
+  function handleCardClick(url: string) {
+    if (selectedIndex !== null) {
+      window.open(url, '_blank');
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
@@ -106,8 +119,9 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 bg-white text-black">
-      <div className="w-full max-w-5xl">
-        <h1 className="text-4xl font-bold mb-8 text-center text-orange-500">hacker news duel</h1>
+    <div className="w-full max-w-5xl">
+      <h1 className="text-4xl font-bold mb-8 text-center text-orange-500">hacker news duel</h1>
+      
         <div className="flex justify-center mb-4">
         </div>
 
@@ -129,15 +143,24 @@ export default function Home() {
                     : ''
               }`}
               style={{ backgroundColor: 'rgb(246, 246, 239)' }}
-              onClick={() => handleGuess(index as 0 | 1)}
+              onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.url)}
             >
-              <h2 className="text-xl font-semibold mb-2">{story.title}</h2>
-              <p className="text-sm text-gray-600">
-                {story.score} points by {story.by} {new Date(story.time * 1000).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-600">
-                {story.descendants} comments
-              </p>
+              <h2 className="text-lg font-medium mb-2">{story.title}</h2>
+              <div className="text-gray-600 text-xs">
+                <span className={selectedIndex === null ? "blur-sm" : ""}>{story.score} points</span>
+                {' by '}
+                <span>{story.by}</span>
+                {' '}
+                <span>{getDaysAgo(story.time)}</span>
+                {' | '}
+                <span>{story.descendants} comments</span>
+              </div>
+              {selectedIndex !== null && (
+                <div className="mt-2 flex items-center text-blue-500 hover:underline">
+                  <span className="mr-1">View on Hacker News</span>
+                  <ExternalLink size={16} />
+                </div>
+              )}
             </div>
           ))}
         </div>
