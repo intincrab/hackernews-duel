@@ -131,37 +131,34 @@ export default function Home() {
           <span>Longest Streak: {longestStreak}</span>
         </div>
         <p className="mb-4 text-center">Can you predict which post got more points?</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {currentPair.map((story, index) => (
             <div 
-              key={story.id} 
-              className={`p-4 rounded-lg shadow-md max-w-2xl cursor-pointer transition transform hover:scale-105 border-2 group ${
-                selectedIndex === index
-                  ? (index === correctIndex ? 'border-green-500 scale-105' : 'border-red-500 scale-105')
-                  : selectedIndex !== null
-                    ? 'opacity-50'
-                    : ''
-              }`}
-              style={{ backgroundColor: 'rgb(246, 246, 239)' }}
-              onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.url)}
-            >
-              <h2 className="text-lg font-medium mb-2">{story.title}</h2>
-              <div className="text-gray-600 text-xs">
-                <span className={selectedIndex === null ? "blur-sm" : ""}>{story.score} points</span>
-                {' by '}
-                <span>{story.by}</span>
-                {' '}
-                <span>{getDaysAgo(story.time)}</span>
-                {' | '}
-                <span>{story.descendants} comments</span>
-              </div>
-              {selectedIndex !== null && (
-                <div className="mt-2 flex items-center text-blue-500 hover:underline">
-                  <span className="mr-1">View on Hacker News</span>
-                  <ExternalLink size={16} />
-                </div>
-              )}
+            key={story.id} 
+            className={`p-4 rounded-lg shadow-md max-w-2xl cursor-pointer transition transform hover:scale-105 border-2 group ${
+              selectedIndex === index
+                ? (index === correctIndex ? 'border-green-500 scale-105' : 'border-red-500 scale-105')
+                : selectedIndex !== null
+                  ? 'opacity-50'
+                  : ''
+            }`}
+            style={{ backgroundColor: 'rgb(246, 246, 239)', position: 'relative' }}
+            onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.url)}
+          >
+            <h2 className="text-lg font-medium mb-2">{story.title}</h2>
+            <div className="text-gray-600 text-xs">
+              <span className={selectedIndex === null ? "blur-sm" : ""}>{story.score} points</span>
+              {' by '}
+              <span>{story.by}</span>
+              {' '}
+              <span>{getDaysAgo(story.time)}</span>
+              {' | '}
+              <span>{story.descendants} comments</span>
             </div>
+            <div className="absolute top-2 right-2 flex items-center text-black opacity-0 group-hover:opacity-100 transition-opacity">
+              <ExternalLink size={16} />
+            </div>
+          </div>          
           ))}
         </div>
         <div className="mt-4 text-center">
