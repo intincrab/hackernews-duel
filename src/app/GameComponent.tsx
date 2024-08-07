@@ -131,7 +131,7 @@ export default function GameComponent({ initialStories }: { initialStories: Stor
                 {' '}
                 <span>{getDaysAgo(story.time)}</span>
                 {' | '}
-                <span>{story.descendants} comments</span>
+                <span className={selectedIndex === null ? "blur-sm" : ""}>{story.descendants} comments</span>
               </div>
               {selectedIndex !== null && (
                 <div className="absolute top-2 right-2 flex items-center text-black transition-opacity">
