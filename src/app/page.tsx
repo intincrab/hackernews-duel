@@ -93,9 +93,9 @@ export default function Home() {
     setIsPaused(!isPaused);
   }
 
-  function handleCardClick(url: string) {
+  function handleCardClick(storyId: number) {
     if (selectedIndex !== null) {
-      window.open(url, '_blank');
+      window.open(`https://news.ycombinator.com/item?id=${storyId}`, '_blank');
     }
   }
 
@@ -144,7 +144,7 @@ export default function Home() {
                     : ''
               }`}
               style={{ backgroundColor: 'rgb(246, 246, 239)', position: 'relative' }}
-              onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.url)}
+              onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.id)}
             >
               <h2 className="text-lg font-medium mb-2">{story.title}</h2>
               <div className="text-gray-600 text-xs">
