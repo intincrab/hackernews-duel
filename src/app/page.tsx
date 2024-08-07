@@ -133,9 +133,9 @@ export default function Home() {
         </div>
         <p className="mb-4 text-center">Can you predict which post got more points?</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {currentPair.map((story, index) => (
-            <div 
-              key={story.id} 
+  {currentPair.map((story, index) => (
+    <div 
+      key={story.id} 
               className={`p-4 rounded-lg shadow-md max-w-2xl cursor-pointer transition transform hover:scale-105 border-2 group ${
                 selectedIndex === index
                   ? (index === correctIndex ? 'border-green-500 scale-105' : 'border-red-500 scale-105')
@@ -156,12 +156,14 @@ export default function Home() {
                 {' | '}
                 <span>{story.descendants} comments</span>
               </div>
-              <div className="absolute top-2 right-2 flex items-center text-black opacity-0 group-hover:opacity-100 transition-opacity">
-                <ExternalLink size={16} />
-              </div>
-            </div>          
-          ))}
+      {selectedIndex !== null && (
+        <div className="absolute top-2 right-2 flex items-center text-black transition-opacity">
+          <ExternalLink size={12} />
         </div>
+      )}
+    </div>
+  ))}
+</div>
         {selectedIndex !== null && (
           <div className="mt-4 text-center">
             <p className="text-gray-400 text-sm">New posts in {timer} seconds</p>
