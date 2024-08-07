@@ -72,19 +72,21 @@ export default function GameComponent({ initialStories }: { initialStories: Stor
 
   function handleGuess(index: 0 | 1) {
     if (selectedIndex !== null) return;
-
+  
     const correct = currentPair[index].score >= currentPair[1 - index].score;
     setSelectedIndex(index);
     setCorrectIndex(correct ? index : 1 - index);
-
+  
     if (correct) {
       setScore(prevScore => prevScore + 1);
       setStreak(prevStreak => prevStreak + 1);
       setLongestStreak(prevLongest => Math.max(prevLongest, streak + 1));
     } else {
+      setScore(prevScore => prevScore - 1);  // Subtract 1 from score for incorrect guess
       setStreak(0);
     }
   }
+  
 
   function handlePause() {
     setIsPaused(prevPaused => !prevPaused);
