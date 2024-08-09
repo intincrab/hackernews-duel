@@ -1,70 +1,36 @@
-# hacker news duel
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-an interactive web game where you guess which of two hacker news posts has a higher score. compete to see how well you know the popular stories on hacker news!
+## Getting Started
 
-## features
+First, run the development server:
 
-- **gameplay**: guess which post has a higher score between two given options.
-- **score tracking**: keep track of your score, current streak, and longest streak.
-- **timer**: a countdown timer challenges you to make quick decisions.
-- **pause and resume**: pause the game if needed and resume when you're ready.
-- **responsive design**: play the game on various devices with a mobile-friendly layout.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## installation
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-to get started with **hacker news duel**, follow these steps:
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-1. **clone the repository**
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-   ```bash
-   git clone https://github.com/intincrab/hackernews-duel.git
-   cd hackernews-duel
-   ```
+## Learn More
 
-2. **install dependencies**
+To learn more about Next.js, take a look at the following resources:
 
-   ensure you have [node.js](https://nodejs.org/) installed. then run:
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-   ```bash
-   npm install
-   ```
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-3. **run the development server**
+## Deploy on Vercel
 
-   ```bash
-   npm run dev
-   ```
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-   your application should now be running on [http://localhost:3000](http://localhost:3000).
-
-## usage
-
-1. **play the game**
-
-   when the game starts, you'll see two hacker news posts. your task is to guess which post has a higher score. click on one of the posts to make your guess.
-
-2. **scoring and streaks**
-
-   - correct guesses increase your score and current streak.
-   - incorrect guesses decrease your score and reset the streak.
-   - your longest streak is also tracked.
-
-3. **timer**
-
-   you have 5 seconds to make a decision for each pair of posts. if the timer runs out, a new pair will be presented.
-
-4. **pause and resume**
-
-   you can pause the game if needed and resume it later.
-
-5. **view post details**
-
-   after making a guess, click on the post to view its details on hacker news.
-
-## contributing
-
-feel free to submit issues or pull requests.
-
-## license
-
-this project is licensed under the [LICENSE](LICENSE).
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
