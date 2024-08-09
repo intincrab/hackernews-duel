@@ -100,6 +100,14 @@ export default function Home() {
     }
   }
 
+  function getDomain(url: string): string {
+    try {
+      return new URL(url).hostname.replace('www.', '');
+    } catch (e) {
+      return '';
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
@@ -114,7 +122,6 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center min-h-screen">
         <h2 className="text-gray-500 text-2xl font-bold mb-4">Game Over</h2>
         <Button className="bg-white text-orange-500 hover:bg-gray-200 transition-colors" onClick={loadStories}>Play Again</Button>
-
       </div>
     );
   }
@@ -122,7 +129,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 bg-white text-black">
       <div className="w-full max-w-5xl">
-        <h1 className="text-4xl font-bold mb-8 text-center text-orange-500">hacker news duel</h1>
+        <h1 className="text-4xl font-bold mb-8 text-center text-orange-500">Hacker News Duel</h1>
 
         <div className="flex justify-center mb-4">
         </div>
@@ -134,10 +141,10 @@ export default function Home() {
         </div>
         <p className="mb-4 text-center">Can you predict which post got more points?</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-  {currentPair.map((story, index) => (
-    <div 
-      key={story.id} 
-              className={`p-4 rounded-lg shadow-md max-w-2xl cursor-pointer transition transform hover:scale-105 border-2 group ${
+          {currentPair.map((story, index) => (
+            <div 
+              key={story.id} 
+              className={`flex p-4 rounded-lg shadow-md max-w-4xl cursor-pointer transition transform hover:scale-105 border-2 group ${
                 selectedIndex === index
                   ? (index === correctIndex ? 'border-green-500 scale-105' : 'border-red-500 scale-105')
                   : selectedIndex !== null
@@ -147,24 +154,28 @@ export default function Home() {
               style={{ backgroundColor: 'rgb(246, 246, 239)', position: 'relative' }}
               onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.id)}
             >
-              <h2 className="text-lg font-medium mb-2">{story.title}</h2>
-              <div className="text-gray-600 text-xs">
-                <span className={selectedIndex === null ? "blur-sm" : ""}>{story.score} points</span>
-                {' by '}
-                <span>{story.by}</span>
-                {' '}
-                <span>{getDaysAgo(story.time)}</span>
-                {' | '}
-                <span className={selectedIndex === null ? "blur-sm" : ""}>{story.descendants} comments</span>
+              <div className="flex-1">
+                <h2 className="text-lg font-medium mb-2">
+                  {story.title} <span className="text-gray-500 text-xs">({getDomain(story.url)})</span>
+                </h2>
+                <div className="text-gray-600 text-xs">
+                  <span className={selectedIndex === null ? "blur-sm" : ""}>{story.score} points</span>
+                  {' by '}
+                  <span>{story.by}</span>
+                  {' '}
+                  <span>{getDaysAgo(story.time)}</span>
+                  {' | '}
+                  <span className={selectedIndex === null ? "blur-sm" : ""}>{story.descendants} comments</span>
+                </div>
               </div>
-      {selectedIndex !== null && (
-        <div className="absolute top-2 right-2 flex items-center text-black transition-opacity">
-          <ExternalLink size={12} />
+              {selectedIndex !== null && (
+                <div className="absolute top-2 right-2 flex items-center text-black transition-opacity">
+                  <ExternalLink size={12} />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-      )}
-    </div>
-  ))}
-</div>
         {selectedIndex !== null && (
           <div className="mt-4 text-center">
             <p className="text-gray-400 text-sm">New posts in {timer} seconds</p>
