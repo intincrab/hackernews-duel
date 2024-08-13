@@ -12,8 +12,8 @@ export interface Story {
   descendants: number;
 }
 
-export async function fetchTopStories(): Promise<number[]> {
-  const response = await axios.get(`${BASE_URL}/topstories.json`);
+export async function fetchBestStories(limit: number = 50): Promise<number[]> {
+  const response = await axios.get(`${BASE_URL}/beststories.json?orderBy="$priority"&limitToFirst=${limit}`);
   return response.data;
 }
 
@@ -22,16 +22,8 @@ export async function fetchStoryDetails(id: number): Promise<Story> {
   return response.data;
 }
 
-export async function fetchRecentStories(count: number = 10): Promise<Story[]> {
-  const topStories = await fetchTopStories();
-  const oneMonthAgo = Date.now() / 1000 - 30 * 24 * 60 * 60;
-  
-  const stories = await Promise.all(
-    topStories.slice(0, 100).map(fetchStoryDetails)
-  );
-  
-  return stories
-    .filter(story => story.time > oneMonthAgo && story.score >= 8)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, count);
+export async function fetchTopStories(count: number = 50): Promise<Story[]> {
+  const storyIds = await fetchBestStories(count);
+  const stories = await Promise.all(storyIds.map(fetchStoryDetails));
+  return stories.filter(story => story.url); // Ensure stories have a URL
 }

@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react';
-import { fetchRecentStories, Story } from '../utils/api';
+import { useState, useEffect, useCallback } from 'react';
+import { fetchTopStories, Story } from '../utils/api';
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ExternalLink } from 'lucide-react';
@@ -18,9 +18,34 @@ export default function Home() {
   const [isPaused, setIsPaused] = useState(false);
   const [correctIndex, setCorrectIndex] = useState<number | null>(null);
 
+  const loadStories = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const fetchedStories = await fetchTopStories(50);
+      setStories(fetchedStories);
+    } catch (error) {
+      console.error('Failed to fetch stories:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadStories();
-  }, []);
+    const interval = setInterval(() => {
+      if (!isPaused) {
+        loadStories();
+      }
+    }, 300000); // Fetch new stories every 5 minutes
+
+    return () => clearInterval(interval);
+  }, [isPaused, loadStories]);
+
+  useEffect(() => {
+    if (stories.length >= 2 && !currentPair) {
+      nextPair();
+    }
+  }, [stories, currentPair]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -29,38 +54,31 @@ export default function Home() {
         setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
     } else if (timer === 0) {
-      nextPair(stories);
+      nextPair();
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [selectedIndex, isPaused, timer, stories]);
+  }, [selectedIndex, isPaused, timer]);
 
-  async function loadStories() {
-    setIsLoading(true);
-    try {
-      const fetchedStories = await fetchRecentStories(10);
-      setStories(fetchedStories);
-      nextPair(fetchedStories);
-    } catch (error) {
-      console.error('Failed to fetch stories:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  function nextPair(stories: Story[]) {
+  function nextPair() {
     if (stories.length < 2) {
-      setCurrentPair(null);
+      loadStories();
       return;
     }
-    const pair: [Story, Story] = [stories[0], stories[1]];
+    const randomIndex = Math.floor(Math.random() * (stories.length - 1));
+    const pair: [Story, Story] = [stories[randomIndex], stories[randomIndex + 1]];
     setCurrentPair(pair);
-    setStories(stories.slice(2));
+    setStories(stories.filter((_, index) => index !== randomIndex && index !== randomIndex + 1));
     setSelectedIndex(null);
     setTimer(5);
     setIsPaused(false);
     setCorrectIndex(null);
+
+    // Reload stories if running low
+    if (stories.length < 6) {
+      loadStories();
+    }
   }
 
   function getDaysAgo(timestamp: number): string {
@@ -81,13 +99,13 @@ export default function Home() {
       setStreak(streak + 1);
       setLongestStreak(Math.max(longestStreak, streak + 1));
     } else {
-      setScore(prevScore => prevScore - 1);
+      setScore(prevScore => Math.max(0, prevScore - 1));
       setStreak(0);
     }
   }
 
   function handleNext() {
-    nextPair(stories);
+    nextPair();
   }
 
   function handlePause() {
@@ -108,7 +126,7 @@ export default function Home() {
     }
   }
 
-  if (isLoading) {
+  if (isLoading && !currentPair) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Skeleton className="w-[300px] h-[200px] mb-4" />
@@ -117,22 +135,13 @@ export default function Home() {
     );
   }
 
-  if (!currentPair) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h2 className="text-gray-500 text-2xl font-bold mb-4">Game Over</h2>
-        <Button className="bg-white text-orange-500 hover:bg-gray-200 transition-colors" onClick={loadStories}>Play Again</Button>
-      </div>
-    );
-  }
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 bg-white text-black">
       <div className="w-full max-w-5xl">
-        <h1 className="text-4xl font-bold mb-8 text-center text-orange-500">Hacker News Duel</h1>
+      {/* <div className="flex flex-col items-center mb-8"> */}
 
-        <div className="flex justify-center mb-4">
-        </div>
+      <h1 className="text-4xl font-bold mb-8 text-center text-orange-500">Hacker News Duel <span className="flex items-center justify-center flex-row text-gray-300 text-xs py-2">(orange site duel)</span></h1>
+        {/* </div> */}
 
         <div className="mb-4 text-center">
           <span className="mr-4">Score: {score}</span>
@@ -140,9 +149,10 @@ export default function Home() {
           <span>Longest Streak: {longestStreak}</span>
         </div>
         <p className="mb-4 text-center">Can you predict which post got more points?</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {currentPair.map((story, index) => (
-            <div 
+        {currentPair && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {currentPair.map((story, index) => (
+              <div 
               key={story.id} 
               className={`flex p-4 rounded-lg shadow-md max-w-4xl cursor-pointer transition transform hover:scale-105 border-2 group ${
                 selectedIndex === index
@@ -154,28 +164,29 @@ export default function Home() {
               style={{ backgroundColor: 'rgb(246, 246, 239)', position: 'relative' }}
               onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.id)}
             >
-              <div className="flex-1">
-                <h2 className="text-lg font-medium mb-2">
-                  {story.title} <span className="text-gray-500 text-xs">({getDomain(story.url)})</span>
-                </h2>
-                <div className="text-gray-600 text-xs">
-                  <span className={selectedIndex === null ? "blur-sm" : ""}>{story.score} points</span>
-                  {' by '}
-                  <span>{story.by}</span>
-                  {' '}
-                  <span>{getDaysAgo(story.time)}</span>
-                  {' | '}
-                  <span className={selectedIndex === null ? "blur-sm" : ""}>{story.descendants} comments</span>
+                <div className="flex-1">
+                  <h2 className="text-lg font-medium mb-2">
+                    {story.title} <span className="text-gray-500 text-xs">({getDomain(story.url)})</span>
+                  </h2>
+                  <div className="text-gray-600 text-xs">
+                    <span className={selectedIndex === null ? "blur-sm" : ""}>{story.score} points</span>
+                    {' by '}
+                    <span>{story.by}</span>
+                    {' '}
+                    <span>{getDaysAgo(story.time)}</span>
+                    {' | '}
+                    <span className={selectedIndex === null ? "blur-sm" : ""}>{story.descendants} comments</span>
+                  </div>
                 </div>
+                {selectedIndex !== null && (
+                  <div className="absolute top-2 right-2 flex items-center text-black transition-opacity">
+                    <ExternalLink size={12} />
+                  </div>
+                )}
               </div>
-              {selectedIndex !== null && (
-                <div className="absolute top-2 right-2 flex items-center text-black transition-opacity">
-                  <ExternalLink size={12} />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
         {selectedIndex !== null && (
           <div className="mt-4 text-center">
             <p className="text-gray-400 text-sm">New posts in {timer} seconds</p>
