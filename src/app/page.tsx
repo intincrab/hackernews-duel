@@ -30,38 +30,7 @@ export default function Home() {
     }
   }, []);
 
-  useEffect(() => {
-    loadStories();
-    const interval = setInterval(() => {
-      if (!isPaused) {
-        loadStories();
-      }
-    }, 300000); // Fetch new stories every 5 minutes
-
-    return () => clearInterval(interval);
-  }, [isPaused, loadStories]);
-
-  useEffect(() => {
-    if (stories.length >= 2 && !currentPair) {
-      nextPair();
-    }
-  }, [stories, currentPair]);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (selectedIndex !== null && !isPaused && timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prevTimer) => prevTimer - 1);
-      }, 1000);
-    } else if (timer === 0) {
-      nextPair();
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [selectedIndex, isPaused, timer]);
-
-  function nextPair() {
+  const nextPair = useCallback(() => {
     if (stories.length < 2) {
       loadStories();
       return;
@@ -79,7 +48,38 @@ export default function Home() {
     if (stories.length < 6) {
       loadStories();
     }
-  }
+  }, [stories, loadStories]);
+
+  useEffect(() => {
+    loadStories();
+    const interval = setInterval(() => {
+      if (!isPaused) {
+        loadStories();
+      }
+    }, 300000); // Fetch new stories every 5 minutes
+
+    return () => clearInterval(interval);
+  }, [isPaused, loadStories]);
+
+  useEffect(() => {
+    if (stories.length >= 2 && !currentPair) {
+      nextPair();
+    }
+  }, [stories, currentPair, nextPair]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (selectedIndex !== null && !isPaused && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      nextPair();
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [selectedIndex, isPaused, timer, nextPair]);
 
   function getDaysAgo(timestamp: number): string {
     const now = Date.now();
@@ -102,14 +102,6 @@ export default function Home() {
       setScore(prevScore => Math.max(0, prevScore - 1));
       setStreak(0);
     }
-  }
-
-  function handleNext() {
-    nextPair();
-  }
-
-  function handlePause() {
-    setIsPaused(!isPaused);
   }
 
   function handleCardClick(storyId: number) {
@@ -138,10 +130,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 bg-white text-black">
       <div className="w-full max-w-5xl">
-      {/* <div className="flex flex-col items-center mb-8"> */}
-
-      <h1 className="text-4xl font-bold mb-8 text-center text-orange-500">Hacker News Duel <span className="flex items-center justify-center flex-row text-gray-300 text-xs py-2">(orange site duel)</span></h1>
-        {/* </div> */}
+        <h1 className="text-4xl font-bold mb-8 text-center text-orange-500">Hacker News Duel <span className="flex items-center justify-center flex-row text-gray-300 text-xs py-2">(orange site duel)</span></h1>
 
         <div className="mb-4 text-center">
           <span className="mr-4">Score: {score}</span>
@@ -153,17 +142,17 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {currentPair.map((story, index) => (
               <div 
-              key={story.id} 
-              className={`flex p-4 rounded-lg shadow-md max-w-4xl cursor-pointer transition transform hover:scale-105 border-2 group ${
-                selectedIndex === index
-                  ? (index === correctIndex ? 'border-green-500 scale-105' : 'border-red-500 scale-105')
-                  : selectedIndex !== null
-                    ? 'opacity-50'
-                    : ''
-              }`}
-              style={{ backgroundColor: 'rgb(246, 246, 239)', position: 'relative' }}
-              onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.id)}
-            >
+                key={story.id} 
+                className={`flex p-4 rounded-lg shadow-md max-w-4xl cursor-pointer transition transform hover:scale-105 border-2 group ${
+                  selectedIndex === index
+                    ? (index === correctIndex ? 'border-green-500 scale-105' : 'border-red-500 scale-105')
+                    : selectedIndex !== null
+                      ? 'opacity-50'
+                      : ''
+                }`}
+                style={{ backgroundColor: 'rgb(246, 246, 239)', position: 'relative' }}
+                onClick={() => selectedIndex === null ? handleGuess(index as 0 | 1) : handleCardClick(story.id)}
+              >
                 <div className="flex-1">
                   <h2 className="text-lg font-medium mb-2">
                     {story.title} <span className="text-gray-500 text-xs">({getDomain(story.url)})</span>
@@ -191,13 +180,13 @@ export default function Home() {
           <div className="mt-4 text-center">
             <p className="text-gray-400 text-sm">New posts in {timer} seconds</p>
             <Button 
-              onClick={handlePause} 
+              onClick={() => setIsPaused(!isPaused)}
               className="mr-2 bg-white text-black hover:bg-gray-200 transition-colors"
             >
               {isPaused ? 'Resume' : 'Pause'}
             </Button>
             <Button 
-              onClick={handleNext}
+              onClick={nextPair}
               className="bg-white text-orange-500 hover:bg-gray-200 transition-colors"
             >
               Next
