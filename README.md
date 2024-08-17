@@ -2,6 +2,9 @@
 
 an interactive web game where you guess which of two hacker news posts has a higher score. compete to see how well you know the popular stories on hacker news!
 
+![image](https://github.com/user-attachments/assets/621fffda-c490-466d-b2ac-a26634c412ba)
+
+
 ## features
 
 - **gameplay**: guess which post has a higher score between two given options.
