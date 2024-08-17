@@ -130,10 +130,10 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-8 bg-white text-gray-800">
       <div className="w-full max-w-5xl">
-      <h1 className="text-5xl font-extrabold mb-8 text-center text-orange-600 drop-shadow-md">
-  <span className="text-orange-500">HN </span>
+      <h1 className="text-5xl font-extrabold mb-8 text-center text-orange-600 ">
+  <span className="text-orange-500">Hacker News </span>
   <span className="text-gray-600">Duel</span>
-  <span className="block text-sm font-normal text-gray-600 mt-2">Can you predict which post got more points?</span>
+  <span className="block text-sm font-normal text-gray-500 mt-2">Can you predict which post got more points?</span>
 </h1>
 
 
@@ -196,21 +196,21 @@ export default function Home() {
 
         {selectedIndex !== null && (
           <div className="mt-8 text-center">
-            <p className="text-xl mb-4">
+            {/* <p className="text-gray-650 text-xl mb-4">
               {correctIndex === selectedIndex 
                 ? "Great job! You guessed correctly." 
                 : "Oops! Better luck next time."}
-            </p>
-            <p className="text-gray-600 text-lg mb-4">Next pair in {timer} seconds</p>
+            </p> */}
+            <p className="text-gray-400 text-lsm mb-4">Next pair in {timer} seconds</p>
             <Button 
               onClick={() => setIsPaused(!isPaused)}
-              className="mr-4 bg-orange-100 text-orange-700 hover:bg-orange-200 transition-colors text-lg px-6 py-3 rounded-full"
+              className="mr-4 bg-orange-100 text-orange-500 hover:bg-orange-200 transition-colors text-lg px-6 py-3"
             >
               {isPaused ? 'Resume' : 'Pause'}
             </Button>
             <Button 
               onClick={nextPair}
-              className="bg-orange-500 text-white hover:bg-orange-600 transition-colors text-lg px-6 py-3 rounded-full"
+              className="bg-orange-400 text-white hover:bg-orange-500 transition-colors text-lg px-6 py-3 "
             >
               Next Pair
             </Button>
